@@ -42,7 +42,7 @@ app.use(morgan('dev'));
 
 // get 요청에 대한 응답 (API)
 app.get('/', (req, res) => {
-    res.status(200).send('언제까지 Hello?');
+    res.status(200).send('언제까지 Hello를 해봤니?');
 });
 
 app.set('port', port);
