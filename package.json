@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/codestates/im22project7-server#readme",
   "dependencies": {
+    "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
     "eslint": "^7.9.0",
     "express": "^4.17.1",
