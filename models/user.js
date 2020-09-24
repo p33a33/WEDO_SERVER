@@ -1,7 +1,6 @@
+const crypto = require('crypto')
 'use strict';
-const {
-  Model
-} = require('sequelize');
+const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class user extends Model {
     /**
@@ -19,10 +18,16 @@ module.exports = (sequelize, DataTypes) => {
   user.init({
     email: DataTypes.STRING,
     nickname: DataTypes.STRING,
+    full_name: DataTypes.STRING,
     password: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'user',
   });
+  user.addHook('afterValidate', (data, options) =>{
+    data.password = crypto.createHmac('sha256','4bproject')
+    .update(data.password)
+    .digest("base64")
+    })
   return user;
 };
