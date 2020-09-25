@@ -9,7 +9,7 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       user_id: {
-        allowNull: false,
+        // allowNull: false,
         type: Sequelize.INTEGER,
         references :{
           model : 'users',
@@ -17,7 +17,7 @@ module.exports = {
         }
       },
       follow_id: {
-        allowNull: false,
+        // allowNull: false,
         type: Sequelize.INTEGER,
         references : {
           model: 'users',

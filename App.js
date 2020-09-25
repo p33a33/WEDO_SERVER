@@ -4,6 +4,8 @@ const cors = require('cors');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 
+const controller = require('./controller/index');
+
 // const usersRouter = require('');
 // const linkRouter = require('');
 
@@ -15,7 +17,7 @@ const port = 5000;
 
 app.use(
     session({
-        secret: '4B', // 상의 후 결정
+        secret: '@4B', // 상의 후 결정
         resave: false,
         saveUninitialized: true
     })
@@ -30,9 +32,9 @@ app.use(express.json());
 
 app.use(
     cors({
-        origin: ['http://localhost:5000'], // 추후변경
-        methods: ['GET', 'POST'],
-        credential: true
+        origin: ["http://localhost:3000"],
+        method: ["GET", "POST"],
+        credentials: true
     })
 );
 
@@ -41,9 +43,19 @@ app.use(morgan('dev'));
 
 
 // get 요청에 대한 응답 (API)
-app.get('/', (req, res) => {
-    res.status(200).send('언제까지 Hello를 해봤니?');
-});
+app.post("/signin", controller.signInController);
+app.post("/signup", controller.signUpController);
+app.post("/signout", controller.signOutController);
+app.post("/signeditnickname", controller.signEditNickname);
+app.post("/signeditpassword", controller.signEditPassword);
+
+app.get("/mypage", controller.mypageController);
+app.get("/main",controller.mainController);
+app.post("/todoedit", controller.todoEdit);
+app.post("/todoWrite", controller.todoWrite);
+app.post("/todoDelete", controller.todoDelete);
+app.post("/clear", controller.clear);
+
 
 app.set('port', port);
 app.listen(app.get('port'), () => {

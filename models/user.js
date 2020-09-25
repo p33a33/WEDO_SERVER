@@ -1,4 +1,5 @@
 const crypto = require('crypto')
+
 'use strict';
 const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
@@ -10,9 +11,9 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      user.hasMany(modles.todo, {
-        foreignKey: {allowNull: false},
-        as: 'todos'})
+      user.hasMany(models.todo, {
+        foreignKey: 'user_id',
+        sourceKey: 'id'})
     }
   };
   user.init({
@@ -25,9 +26,11 @@ module.exports = (sequelize, DataTypes) => {
     modelName: 'user',
   });
   user.addHook('afterValidate', (data, options) =>{
+    if(data.password){
     data.password = crypto.createHmac('sha256','4bproject')
     .update(data.password)
     .digest("base64")
+    }
     })
   return user;
 };
