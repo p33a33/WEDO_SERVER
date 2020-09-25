@@ -1,4 +1,6 @@
 const crypto = require('crypto')
+const { todo } = require('../models');
+
 'use strict';
 const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
@@ -10,9 +12,9 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      user.hasMany(modles.todo, {
-        foreignKey: {allowNull: false},
-        as: 'todos'})
+      user.hasMany(models.todo, {
+        foreignKey: 'user_id',
+        sourceKey: 'id'})
     }
   };
   user.init({
@@ -29,5 +31,7 @@ module.exports = (sequelize, DataTypes) => {
     .update(data.password)
     .digest("base64")
     })
+
+
   return user;
 };

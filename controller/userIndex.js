@@ -1,6 +1,7 @@
 const { user } = require('../models');
-const { todo } = require('../models')
+const { todo } = require('../models');
 const crypto = require('crypto');
+
 module.exports = {
     signInController: (req, res) => {
         const sess = req.session;
@@ -71,38 +72,46 @@ module.exports = {
             res.status(401).send("세션을 찾지 못했습니다.")
         }
     },
-    signEditController: (req , res) => {
-        const {nickname,password,newPassword } = req.body;
+    signEditNickname: (req , res) => {
+        const { nickname } = req.body;
         const sess = req.session
-        if(nickname){
-            user.update({nickname: nickname}, {where:{ id:sess.userid }})
-            .then( (data) => res.status(200).json(data))
-            .catch((err) => {
+        
+        user.update({nickname: nickname},{ where: { id:sess.userid }})
+            .then((data) => res.status(200).json(data))
+            .catch((err)=> {
                 console.log(err);
-                res.sendStatus(500);
+                res.status(500);
             });
-        } else if(password && newPassword){
-            const hashingPassword = crypto.createHmac('sha256', '4bproject')
-            .update(password)
-            .digest('base64');
-            user.findOne({
-                where: {password: hashingPassword}
-            }).then((data) => {
-                if(data){
-                    user.update({password: newPassword}, {where:{id:sess.userid }})
-                    .then((data) => res.status(205).json(data))
-                    .catch((err) => {
-                        console.log(err);
-                        res.sendStatus(500);
-                    });
-                }else if(!data){
-                    res.status(404).send("비밀번호를 확인해주세요.")
-                }
-             })
-        }else {
-            res.status(400).send("회원정보를 수정할 수 없습니다.")
-        }
+        // } else if(password && newPassword){
+        //     const hashingPassword = crypto.createHmac('sha256', '4bproject')
+        //     .update(password)
+        //     .digest('base64');
+        //     user.findOne({
+        //         where: {password: hashingPassword}
+        //     }).then((data) => {
+        //         if(data){
+        //             user.update({password: newPassword}, {where:{id:sess.userid }})
+        //             .then((data) => res.status(205).json(data))
+        //             .catch((err) => {
+        //                 console.log(err);
+        //                 res.sendStatus(500);
+        //             });
+        //         }else if(!data){
+        //             res.status(404).send("비밀번호를 확인해주세요.")
+        //         }
+        //      })
     },
+    signEditPassword: (req, res) => {
+        const { password, newPassword } = req.body;
+        const hashingPassword = crypto.createHmac('sha256', '4bproject')
+        const sess = req.session
+        user.update({ password: newPassword }, { where: hashingPassword })
+            .then((data) => {  res.status(205).json(data) })
+            .catch((err) => { 
+                console.log(err)
+                res.status(500)})
+    },
+
     signOutController: (req, res) => {
         const sess = req.session;
         if(sess.userid){
@@ -118,8 +127,69 @@ module.exports = {
         }
     },
     mainController: (req, res) => {
-        const todos = todo.findAll();
-        //todos 가 없을때는 어떻게 해야할까?? 
-         res.status(200).json(todos);
+        const sess = req.session
+        todo.findAll({
+            where:{ user_id: sess.userid }
+        })
+        .then((data)=> {res.status(200).json(data)})
+        .catch((err) => {
+            console.log("데이터를 조회할수 없습니다.",err);
+            res.status(500);
+        })
+    },
+    todoWrite: (req, res) => {
+        // const { title, body } = req.body;
+        // todo.create({
+        //     title: title,
+        //     body: body,
+        // })
+
+        const sess = req.session;
+        const { title, body } = req.body;
+        user
+            .findOne({
+                where: {
+                    id: 1
+                }
+            })
+            .then((data) => {
+                todo
+                    .create({
+                        user_id: data.id,
+                        title: title,
+                        body: body
+                    })
+                    .then( (data) => {
+                         res.status(200).json(data);
+                        }
+                    ).catch((err) => {
+                        console.log(err);
+                        res.sendStatus(500);
+                    });
+            })
+    },
+    todoEdit: (req,res) =>{
+        // 수정할 todo를 어떻게 찾아갈것인가?
+        const {id, title, body } = req.body;
+        todo.update({title: title, body: body}, {where:{ id: id }})
+            .then( (data) => res.status(200).json(data))
+            .catch((err) => {
+                console.log(err);
+                res.sendStatus(500);
+            });
+    },
+    todoDelete: (req,res) => {
+        //삭제할 todo를 어떻게 찾아 갈것인가??
+        const { id } = req.body
+        todo.destroy({where: {user_id: id}})
+        .then((data)=>{
+            res.status(200).json({})
+        })
+        .catch(err => {
+            console.error(err);
+        })
     }
+    //client 연결 했을때 수정에 대해서
+
+    //client
 }
