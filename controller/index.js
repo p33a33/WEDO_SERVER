@@ -82,24 +82,6 @@ module.exports = {
                 console.log(err);
                 res.status(500);
             });
-        // } else if(password && newPassword){
-        //     const hashingPassword = crypto.createHmac('sha256', '4bproject')
-        //     .update(password)
-        //     .digest('base64');
-        //     user.findOne({
-        //         where: {password: hashingPassword}
-        //     }).then((data) => {
-        //         if(data){
-        //             user.update({password: newPassword}, {where:{id:sess.userid }})
-        //             .then((data) => res.status(205).json(data))
-        //             .catch((err) => {
-        //                 console.log(err);
-        //                 res.sendStatus(500);
-        //             });
-        //         }else if(!data){
-        //             res.status(404).send("비밀번호를 확인해주세요.")
-        //         }
-        //      })
     },
     signEditPassword: (req, res) => {
         const { password, newPassword } = req.body;
@@ -111,7 +93,6 @@ module.exports = {
                 console.log(err)
                 res.status(500)})
     },
-
     signOutController: (req, res) => {
         const sess = req.session;
         if(sess.userid){
@@ -138,12 +119,6 @@ module.exports = {
         })
     },
     todoWrite: (req, res) => {
-        // const { title, body } = req.body;
-        // todo.create({
-        //     title: title,
-        //     body: body,
-        // })
-
         const sess = req.session;
         const { title, body } = req.body;
         user
