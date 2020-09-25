@@ -1,5 +1,4 @@
 'use strict';
-const { user } = require('../models');
 const {
   Model
 } = require('sequelize');

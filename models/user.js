@@ -1,5 +1,4 @@
 const crypto = require('crypto')
-const { todo } = require('../models');
 
 'use strict';
 const { Model } = require('sequelize');
@@ -27,11 +26,11 @@ module.exports = (sequelize, DataTypes) => {
     modelName: 'user',
   });
   user.addHook('afterValidate', (data, options) =>{
+    if(data.password){
     data.password = crypto.createHmac('sha256','4bproject')
     .update(data.password)
     .digest("base64")
+    }
     })
-
-
   return user;
 };

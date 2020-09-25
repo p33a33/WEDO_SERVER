@@ -4,7 +4,7 @@ const cors = require('cors');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 
-const controller = require('./controller/UserIndex');
+const controller = require('./controller/index');
 
 // const usersRouter = require('');
 // const linkRouter = require('');
@@ -17,7 +17,7 @@ const port = 5000;
 
 app.use(
     session({
-        secret: '4B', // 상의 후 결정
+        secret: '@4B', // 상의 후 결정
         resave: false,
         saveUninitialized: true
     })
@@ -31,7 +31,11 @@ app.use(cookieParser());
 app.use(express.json());
 
 app.use(
-    cors()
+    cors({
+        origin: ["http://localhost:3000"],
+        method: ["GET", "POST"],
+        credentials: true
+    })
 );
 
 // POSTMAN을 통한 test
@@ -42,12 +46,15 @@ app.use(morgan('dev'));
 app.post("/signin", controller.signInController);
 app.post("/signup", controller.signUpController);
 app.post("/signout", controller.signOutController);
-app.post("/signedit", controller.signEditController);
+app.post("/signeditnickname", controller.signEditNickname);
+app.post("/signeditpassword", controller.signEditPassword);
+
 app.get("/mypage", controller.mypageController);
 app.get("/main",controller.mainController);
 app.post("/todoedit", controller.todoEdit);
 app.post("/todoWrite", controller.todoWrite);
 app.post("/todoDelete", controller.todoDelete);
+app.post("/clear", controller.clear);
 
 
 app.set('port', port);

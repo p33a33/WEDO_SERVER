@@ -30,7 +30,7 @@ module.exports = {
         });
     },
     signUpController: (req,res) =>{
-        const {email, password, full_name, nickname} = req.body;
+        const {email, password, fullname, nickname} = req.body;
 
         user.findOrCreate({
             where: {
@@ -38,7 +38,7 @@ module.exports = {
             },
             defaults: {
                 password: password,
-                full_name: full_name,
+                full_name: fullname,
                 nickname: nickname
             }
         })
@@ -72,26 +72,40 @@ module.exports = {
             res.status(401).send("세션을 찾지 못했습니다.")
         }
     },
-    signEditNickname: (req , res) => {
+    signEditNickname:  (req , res) => {
         const { nickname } = req.body;
-        const sess = req.session
+        const sess =  req.session
         
-        user.update({nickname: nickname},{ where: { id:sess.userid }})
-            .then((data) => res.status(200).json(data))
+          user.update({nickname: nickname},{ where: { id:sess.userid }})
+            .then((data) => {
+                console.log(data);
+                res.status(200).json(data)
+            } )
             .catch((err)=> {
                 console.log(err);
                 res.status(500);
             });
     },
     signEditPassword: (req, res) => {
-        const { password, newPassword } = req.body;
+        const { password, newpassword } =  req.body;
         const hashingPassword = crypto.createHmac('sha256', '4bproject')
-        const sess = req.session
-        user.update({ password: newPassword }, { where: hashingPassword })
-            .then((data) => {  res.status(205).json(data) })
-            .catch((err) => { 
+        .update(password)
+        .digest('base64');
+
+        const sess = req.session;
+
+        user.findOne({
+            where: {id: sess.userid}
+        })
+        .then((data)=> {
+            if(data.password === hashingPassword){
+                 user.update({ password: newpassword }, { where:{ id: sess.userid }})
+                .then((data) => {  res.status(205).json(data) })
+                .catch((err) => { 
                 console.log(err)
                 res.status(500)})
+            }
+        })
     },
     signOutController: (req, res) => {
         const sess = req.session;
@@ -100,11 +114,9 @@ module.exports = {
                 if(err){
                     console.log(err);
                 } else {
-                    res.redirect('/');
+                    console.log("destroy 성공")
                 }
             });
-        }else {
-            res.redirect('/');
         }
     },
     mainController: (req, res) => {
@@ -124,7 +136,7 @@ module.exports = {
         user
             .findOne({
                 where: {
-                    id: 1
+                    id: sess.userid
                 }
             })
             .then((data) => {
@@ -145,7 +157,7 @@ module.exports = {
     },
     todoEdit: (req,res) =>{
         // 수정할 todo를 어떻게 찾아갈것인가?
-        const {id, title, body } = req.body;
+        const { id, title, body } = req.body;
         todo.update({title: title, body: body}, {where:{ id: id }})
             .then( (data) => res.status(200).json(data))
             .catch((err) => {
@@ -156,15 +168,28 @@ module.exports = {
     todoDelete: (req,res) => {
         //삭제할 todo를 어떻게 찾아 갈것인가??
         const { id } = req.body
-        todo.destroy({where: {user_id: id}})
+        todo.destroy({where: {id: id}})
         .then((data)=>{
             res.status(200).json({})
         })
         .catch(err => {
             console.error(err);
         })
-    }
-    //client 연결 했을때 수정에 대해서
+    },
+    clear:  (req, res)=>{
+        const { id } = req.body;
 
-    //client
+        todo.findOne({
+            where: { id: id }
+        })
+        .then((data)=> {
+           if(data.isclear === 0 ){
+             data.update({isclear: 1}, {where: {id :id}})
+               .then((data)=> {res.status(200).json(data)})
+           }else if(data.isclear === 1){
+               data.update({isclear: 0},{ where: {id: id}})
+               .then((data)=>{res.status(200).json(data)})
+           }else{ res.status(400) }
+        })
+    }
 }
