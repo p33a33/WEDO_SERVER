@@ -12,7 +12,7 @@ const controller = require('./controller/index');
 const morgan = require('morgan');
 
 const app = express();
-const port = 5000;
+const port = 3000;
 
 
 app.use(
@@ -50,7 +50,7 @@ app.post("/signeditnickname", controller.signEditNickname);
 app.post("/signeditpassword", controller.signEditPassword);
 
 app.get("/mypage", controller.mypageController);
-app.get("/main",controller.mainController);
+app.get("/main", controller.mainController);
 app.post("/todoedit", controller.todoEdit);
 app.post("/todoWrite", controller.todoWrite);
 app.post("/todoDelete", controller.todoDelete);

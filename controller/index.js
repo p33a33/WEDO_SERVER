@@ -201,9 +201,19 @@ module.exports = {
             .then((data) => {
                 if (data.isclear === 0) {
                     data.update({ isclear: 1 }, { where: { id: id } })
+                    todo.findOne({
+                        where: {
+                            id: id
+                        }
+                    })
                         .then((data) => { res.status(200).json(data) })
                 } else if (data.isclear === 1) {
                     data.update({ isclear: 0 }, { where: { id: id } })
+                    todo.findOne({
+                        where: {
+                            id: id
+                        }
+                    })
                         .then((data) => { res.status(200).json(data) })
                 } else { res.status(400) }
             })
