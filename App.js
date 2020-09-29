@@ -52,11 +52,16 @@ app.post("/signeditpassword", controller.signEditPassword);
 app.get("/mypage", controller.mypageController);
 app.get("/main", controller.mainController);
 app.post("/todoedit", controller.todoEdit);
-app.post("/todoWrite", controller.todoWrite);
-app.post("/todoDelete", controller.todoDelete);
+app.post("/todowrite", controller.todoWrite);
+app.post("/tododelete", controller.todoDelete);
 app.post("/clear", controller.clear);
 
+app.post("/followadd", controller.followAdd);
+app.get("/followlist", controller.followList);
+app.post("/followdelete", controller.followDelete);
 
+app.post("/sharetodo", controller.shareTodo);
+app.get("/sharelist", controller.shareList);
 app.set('port', port);
 app.listen(app.get('port'), () => {
     console.log(`app is listening music in PORT ${app.get('port')}`);
