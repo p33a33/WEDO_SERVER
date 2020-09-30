@@ -1,19 +1,19 @@
 const express = require('express');
-
-const cors = require('cors');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
-
+const passport = require('passport')
 const controller = require('./controller/index');
+const auth = require('./controller/authentication')
+const LocalStrategy = require('passport-local').Strategy
+const cors = require('cors');
 
 // const usersRouter = require('');
 // const linkRouter = require('');
 
 const morgan = require('morgan');
-
+const bodyParser = require('body-parser')
 const app = express();
 const port = 5000;
-
 
 app.use(
     session({
@@ -23,8 +23,13 @@ app.use(
     })
 );
 
-// cookieParser로 넘어온 cookie데리터를 관리 쉽게 JSON객체로 변환
+// cookieParser로 넘어온 cookie데이터를 관리 쉽게 JSON객체로 변환
 app.use(cookieParser());
+
+//passport 관련 middleware
+app.use(bodyParser.urlencoded({ extended: false })) // 없으면 passport.use(new LocalStrategy()) 가 실행되지 않습니다.
+app.use(bodyParser.json())
+app.use(passport.initialize())
 
 // express.json 으로 넘어온 데이터 JSON 객체로 변환
 
@@ -42,15 +47,19 @@ app.use(
 app.use(morgan('dev'));
 
 
+
+// app.post("/signin", controller.signInController); => passport Local 인증 구현으로 사용 안하게 되었습니당.
+// PASSPORT 를 통한 로컬 로그인 구현
+app.post('/signin', auth.signin)
+
 // get 요청에 대한 응답 (API)
-app.post("/signin", controller.signInController);
 app.post("/signup", controller.signUpController);
 app.post("/signout", controller.signOutController);
 app.post("/signeditnickname", controller.signEditNickname);
 app.post("/signeditpassword", controller.signEditPassword);
 
 app.get("/mypage", controller.mypageController);
-app.get("/main",controller.mainController);
+app.get("/main", controller.mainController);
 app.post("/todoedit", controller.todoEdit);
 app.post("/todowrite", controller.todoWrite);
 app.post("/tododelete", controller.todoDelete);
@@ -67,5 +76,8 @@ app.listen(app.get('port'), () => {
     console.log(`app is listening music in PORT ${app.get('port')}`);
 });
 
-module.exports = app;
+
+
+
+module.exports = app, session;
 ///

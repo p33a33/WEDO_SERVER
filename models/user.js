@@ -13,7 +13,8 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       user.hasMany(models.todo, {
         foreignKey: 'user_id',
-        sourceKey: 'id'})
+        sourceKey: 'id'
+      })
     }
   };
   user.init({
@@ -25,12 +26,23 @@ module.exports = (sequelize, DataTypes) => {
     sequelize,
     modelName: 'user',
   });
-  user.addHook('afterValidate', (data, options) =>{
-    if(data.password){
-    data.password = crypto.createHmac('sha256','4bproject')
-    .update(data.password)
-    .digest("base64")
+  user.addHook('afterValidate', (data, options) => {
+    if (data.password) {
+      data.password = crypto.createHmac('sha256', '4bproject')
+        .update(data.password)
+        .digest("base64")
     }
-    })
+  })
+
+  /* select 쿼리를 날릴 때, where 조건문에 있는 password를 자동으로 hash해주는 hooks를 추가했습니다. */
+  user.addHook('beforeFind', (data, options) => {
+    let password = data.where.password
+    if (password) {
+      data.where.password = crypto.createHmac('sha256', '4bproject')
+        .update(password)
+        .digest("base64")
+    }
+  })
+
   return user;
 };
