@@ -10,33 +10,10 @@ const crypto = require('crypto');
 { cookie : { ... }, passport : { user : 유저레코드 아이디 }
 따라서 sess = req.session을 session_userid = req.session.passport.user 로
 수정합니다. */
+
+// Signin이 Passport로 구현되면서 Signin Controller를 삭제처리 했습니다.
+
 module.exports = {
-    // signInController: (req, res) => {
-    //     const session_userid = req.session.passport.user;
-    //     const { email, password } = req.body;
-    //     const hashingPassword = crypto.createHmac('sha256', '4bproject')
-    //         .update(password)
-    //         .digest('base64');
-    //     //signin 으로 입력된 비밀번호를 다시 해싱
-    //     user.findOne({
-    //         where: {
-    //             email: email,
-    //             password: hashingPassword
-    //         },
-    //     })
-    //         .then((data) => {
-    //             if (!data) {
-    //                 return res.status(404).send("아이디와 비밀번호를 확인해주세요.")
-    //             }
-    //             session_userid = data.id;
-    //             res.status(200).json({
-    //                 id: data.id,
-    //             })
-    //         })
-    //         .catch((err) => {
-    //             res.status(404).send(err);
-    //         });
-    // },
     signUpController: (req, res) => {
         const { email, password, fullname, nickname } = req.body;
 
@@ -242,6 +219,7 @@ module.exports = {
             })
     },
     followList: (req, res) => {
+        console.log(req.session)
         const session_userid = req.session.passport.user;
         follow.findAll({
             where: { user_id: session_userid }

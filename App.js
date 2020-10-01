@@ -37,7 +37,7 @@ app.use(express.json());
 
 app.use(
     cors({
-        origin: ["http://localhost:3000"],
+        origin: ["http://localhost:3000", "http://localhost:5000/*"],
         method: ["GET", "POST"],
         credentials: true
     })
@@ -51,6 +51,10 @@ app.use(morgan('dev'));
 // app.post("/signin", controller.signInController); => passport Local 인증 구현으로 사용 안하게 되었습니당.
 // PASSPORT 를 통한 로컬 로그인 구현
 app.post('/signin', auth.signin)
+
+//PASSPORT - OAUTH2.0 - GOOGLE
+app.get('/auth/google', (req, res, next) => auth.oAuthGoogle(req, res, next))
+app.get('/auth/google/redirect', auth.googleRedirect)
 
 // get 요청에 대한 응답 (API)
 app.post("/signup", controller.signUpController);
