@@ -11,9 +11,13 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      user.hasMany(models.todo, {
-        foreignKey: 'user_id',
-        sourceKey: 'id'
+      user.belongsToMany(models.user, { 
+        as: "friend",
+        through: "follows"
+      }),
+
+      user.belongsToMany(models.todo,{
+        through: 'todo_users'
       })
     }
   };

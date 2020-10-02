@@ -11,9 +11,8 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      todo.belongsTo(models.user,{
-        foreignKey: "user_id",
-        targetKey: "id"
+      todo.belongsToMany(models.user,{
+        through: 'todo_users'
       })
     }
   };
@@ -26,8 +25,7 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: 0
     },
     user_id: DataTypes.INTEGER,
-    share_id: DataTypes.INTEGER,
-    share_status: DataTypes.BOOLEAN
+    share_id: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'todo',

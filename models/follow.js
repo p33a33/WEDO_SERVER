@@ -11,13 +11,20 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      follow.belongsTo(models.user, {as:'myId', foreignKey: 'user_id',targetKey: 'id'});
-      follow.belongsTo(models.user, {as:'friendId', foreignKey: 'follow_id',targetKey: 'id'});
     }
   };
   follow.init({
-    user_id: DataTypes.INTEGER,
-    follow_id: DataTypes.INTEGER
+    block: {
+     type:  DataTypes.BOOLEAN,
+     defaultValue: 0
+    },
+    id: {
+      type : DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true
+    },
+    userId: DataTypes.INTEGER,
+    friendId: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'follow',
