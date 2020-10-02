@@ -6,6 +6,9 @@ const controller = require('./controller/index');
 const auth = require('./controller/authentication')
 const LocalStrategy = require('passport-local').Strategy
 const cors = require('cors');
+const path = require('path');
+
+const models = require('./models/index')
 
 // const usersRouter = require('');
 // const linkRouter = require('');
@@ -29,11 +32,16 @@ app.use(cookieParser());
 //passport 관련 middleware
 app.use(bodyParser.urlencoded({ extended: false })) // 없으면 passport.use(new LocalStrategy()) 가 실행되지 않습니다.
 app.use(bodyParser.json())
-app.use(passport.initialize())
 
 // express.json 으로 넘어온 데이터 JSON 객체로 변환
 
 app.use(express.json());
+
+
+models.sequelize.sync()
+    .then(() => console.log('동기화 성공'))
+    .catch(e => console.log(e));
+
 
 app.use(
     cors({
@@ -42,7 +50,9 @@ app.use(
         credentials: true
     })
 );
-
+app.use(passport.initialize())
+app.use(passport.session());
+app.use(express.static(path.join(__dirname, 'html')));
 // POSTMAN을 통한 test
 app.use(morgan('dev'));
 
@@ -75,6 +85,8 @@ app.post("/followdelete", controller.followDelete);
 
 app.post("/sharetodo", controller.shareTodo);
 app.get("/sharelist", controller.shareList);
+
+
 app.set('port', port);
 app.listen(app.get('port'), () => {
     console.log(`app is listening music in PORT ${app.get('port')}`);

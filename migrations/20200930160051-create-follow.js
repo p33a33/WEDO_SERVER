@@ -1,24 +1,26 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('todo_users', {
+    await queryInterface.createTable('follows', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      owner_id: {
+      block: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: 0
+      },
+      id: {
         type: Sequelize.INTEGER
       },
-      todo_id: {
+      userId: {
         type: Sequelize.INTEGER
       },
-      share_id: {
+      friendId: {
         type: Sequelize.INTEGER
-      },
-      isclear: {
-        type: Sequelize.BOOLEAN
       },
       createdAt: {
         allowNull: false,
@@ -31,6 +33,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('todo_users');
+    await queryInterface.dropTable('follows');
   }
 };
