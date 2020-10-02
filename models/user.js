@@ -11,14 +11,14 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      user.belongsToMany(models.user, { 
+      user.belongsToMany(models.user, {
         as: "friend",
-        through: "follows"
+        through: "follow"
       }),
 
-      user.belongsToMany(models.todo,{
-        through: 'todo_users'
-      })
+        user.belongsToMany(models.todo, {
+          through: 'todo_users'
+        })
     }
   };
   user.init({
@@ -40,10 +40,10 @@ module.exports = (sequelize, DataTypes) => {
 
   /* select 쿼리를 날릴 때, where 조건문에 있는 password를 자동으로 hash해주는 hooks를 추가했습니다. */
   user.addHook('beforeFind', (data, options) => {
-    let password = data.where.password
-    if (password) {
+    console.log(data.where)
+    if (data.where.password) {
       data.where.password = crypto.createHmac('sha256', '4bproject')
-        .update(password)
+        .update(data.where.password)
         .digest("base64")
     }
   })

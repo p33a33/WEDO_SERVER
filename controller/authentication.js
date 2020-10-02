@@ -21,7 +21,7 @@ module.exports = {
                 user.findOne({
                     where: {
                         email: username,
-                        password: password
+                        password: Password
                     }
                 })
                     .then(data => {
@@ -42,7 +42,7 @@ module.exports = {
 
         // authenticate에서 Success 되었다면, 해당 유저를 구분할 수 있도록 Session에 해당 유저의 Unique한 데이터를 담습니다.
         passport.serializeUser((user, done) => { // serializeUser 메소드에 오는 인자 user는 로그인 성공 판정 함수에서 반환하는 해당 유저의 정보입니다. [현재 파일 27번째줄 done의 두번째 인자를 여기로 끌고옵니다.]
-             done(null, user.id) // session에 users 테이블의 id값을 담았습니다.
+            done(null, user.id) // session에 users 테이블의 id값을 담았습니다.
         })
 
 
@@ -60,7 +60,7 @@ module.exports = {
                 }
             }).then(user => {
                 // let { email, nickname, full_name } = data.dataValues
-                 done(null , user)
+                done(null, user)
             })
         })
     },
@@ -105,7 +105,7 @@ module.exports = {
                 }
             }).then(user => {
                 // let { email, nickname, full_name } = data.dataValues
-                 done(null , user)
+                done(null, user)
             })
         })
     },
