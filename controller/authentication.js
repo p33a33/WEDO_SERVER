@@ -93,6 +93,21 @@ module.exports = {
         passport.serializeUser((user, done) => { // done의 인자로 받은 유저 정보를 통해 session에 유저의 id(DB상의 id)를 담아줍니다.
             done(null, user.id)
         })
+
+        passport.deserializeUser((userId, done) => {
+            console.log('is deserialize working?')
+            // user.findById(id, (err, user) => {
+            //     done(null, user); // 여기의 user가 req.user가 됨
+            //   });
+            user.findOne({
+                where: {
+                    id: userId
+                }
+            }).then(user => {
+                // let { email, nickname, full_name } = data.dataValues
+                 done(null , user)
+            })
+        })
     },
 
     googleRedirect(req, res, next) {    // "/auth/google/redirect"로 들어온 Get 요청을 처리해줍니다. 로그인이 성공한 경우 클라이언트의 /main으로 리다이렉트 해줍니다.

@@ -3,7 +3,7 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class todo_users extends Model {
+  class todo_user extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -13,15 +13,19 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   };
-  todo_users.init({
+  todo_user.init({
     isclear: {
       type: DataTypes.BOOLEAN,
-      
       defaultValue: 0
-    }
+    },
+    id: {
+      type : DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true
+    },
   }, {
     sequelize,
-    modelName: 'todo_users',
+    modelName: 'todo_user',
   });
-  return todo_users;
+  return todo_user;
 };

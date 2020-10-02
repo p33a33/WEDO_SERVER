@@ -1,7 +1,7 @@
 const { user } = require('../models');
 const { todo } = require('../models');
 const { follow } = require('../models')
-// const { friend } = require('../models/user')
+const { todo_user } = require('../models')
 const sequelize = require("sequelize");
 
 const crypto = require('crypto');
@@ -74,24 +74,24 @@ module.exports = {
             });
     },
     signEditPassword: (req, res) => {
-        const { password, newpassword } = req.body;
-        const hashingPassword = crypto.createHmac('sha256', '4bproject')
-            .update(password)
-            .digest('base64');
-
+        const { oldpassword, newpassword } = req.body;
         const session_userid = req.session.passport.user;
+        const hashingPassword = crypto.createHmac('sha256', '4bproject')
+            .update(oldpassword)
+            .digest('base64');
 
         user.findOne({
             where: { id: session_userid }
         })
-            .then((data) => {
-                if (data.password === hashingPassword) {
-                    user.update({ password: newpassword }, { where: { id: session_userid } })
-                        .then((data) => { res.status(205).json(data) })
-                        .catch((err) => {
-                            console.log(err)
-                            res.status(500)
-                        })
+        .then((data) => {
+            if (data.password === hashingPassword) {
+                data.update({ password: newpassword })
+                .then(() => { 
+                  res.status(200).send("비밀번호 변경완료!") })
+                .catch((err) => {
+                    console.log(err)
+                    res.status(400)
+                    })
                 }
             })
     },
@@ -185,7 +185,7 @@ module.exports = {
                 })
         })
     },
-    clear: (req, res) => {
+    todoClear: (req, res) => {
         const { id } = req.body;
 
         todo.findOne({
@@ -194,10 +194,10 @@ module.exports = {
             .then((data) => {
                 if (data.isclear === false) {
                     data.update({ isclear: 1 }, { where: { id: id } })
-                    then(() => res.status(200).json(data))
+                    .then(() => res.status(200).json(data))
                 } else if (data.isclear === true) {
                     data.update({ isclear: 0 }, { where: { id: id } })
-                    then(() => res.status(200).json(data))
+                    .then(() => res.status(200).json(data))
                 } else { res.status(400) }
             })
     },
@@ -225,15 +225,17 @@ module.exports = {
                  })
         })
     },
+
     followList: (req,res) => {
         const session_userid = req.session.passport.user
-        
-
         user.findOne({
             where: {id: session_userid},
             include: [{
                 model: user,
                 as: 'friend',
+                through: {
+                    attributes: ['id', 'userId', 'friendId', 'block']
+                }
             }]
         })
         .then((data)=>{
@@ -246,22 +248,42 @@ module.exports = {
             res.status(400).send("불러올 친구가 없나봅니다.human")
         })
     },
+
     followDelete: (req, res) => {
         const session_userid = req.session.passport.user;
-        const { followid } = req.body;
+        const { friendid } = req.body;
 
         follow.destroy({
            where: {
-               userId :sess.userid,
-               friendId: session_userid
+               userId :session_userid,
+               friendId: friendid
            }
         })
-            .then(()=>res.status(200).send("삭제 성공"))
-            .catch((err)=> res.status(400).send("삭제불가", err))
+        .then(()=>{
+            user.findOne({
+                where: {id: session_userid},
+                include: [{
+                    model: user,
+                    as: 'friend',
+                    through: {
+                        attributes: ['id', 'userId', 'friendId', 'block']
+                    }
+                }]
+            })
+            .then((data)=>{
+                console.log(req.session)
+                res.status(200).json(data);
+            })
+            .catch((err)=>{
+                console.log(req.session)
+               console.log("목록을 불러오는데에 에러:", err);
+               res.status(400).send("불러올 친구가 없나봅니다.human")
+            })
+        })
+        .catch((err)=> res.status(400).send("삭제불가", err))
     },
 
     shareTodo: (req, res) => {
-        const session_userid = req.session.passport.user;
         const { todoid, friendid } = req.body;
 
         todo.findOne({where:{id : todoid}})
@@ -270,28 +292,31 @@ module.exports = {
             .then((friend)=>{
                 console.log(data,friend)
                 data.addUsers(friend) //혁신 2020.10.01
-                res.status(200).send('글을 성공적으로 공유하였습니다.')
             })
-            .catch((err)=>{
-                console.log("글을 공유할 수 없습니다.", err);
-                res.status(400).send();
-            });
+            res.status(200).json(data)
          })
+         .catch((err)=>{
+            console.log("글을 공유할 수 없습니다.", err);
+            res.status(400).send();
+        })
     },
+
     shareList: (req, res) =>{
         console.log(req.session)
         const session_userid = req.session.passport.user
         todo.findAll({
             where: {
-                [Op.or] :[{'$users.id$': session_userid},{ user_id: session_userid}]  
+                [Op.or] : [{'$users.id$': session_userid},{ user_id: session_userid}]  
             },
             include: [{
                 model: user,
-                attributes: ['id','nickname','email']
+                attributes: ['id','nickname','email'],
+                through:{
+                    attributes: ['id', 'isclear','userId','todoId']
+                }
             }]
         })
         .then((data)=>{
-            console.log(data);
             res.status(200).json(data);
         })
         .catch((err)=>{
@@ -299,43 +324,54 @@ module.exports = {
             res.status(400).send("공유글을 불러올 수 없습니다.")
         })
     },
+
     shareClear: (req, res) => {
         const { todoid } = req.body;
         const Op = sequelize.Op;
+        const session_userid = req.session.passport.user
 
-        todo_user.findOne({
+        todo.findOne({
             where: {
-                share_id: session_userid,
-                todo_id: todoid
+                [Op.or] : [{user_id: session_userid},{ '$users.todo_users.userId$': session_userid}],
+                [Op.and]:[{todoId: todoid}]
             }
         })
-            .then((data) => {
-                if (data.isclear === true) {
-                    data.update({ isclear: 0 })
-                        .then(() =>
-                            //find
-                            res.status(200).json(data));
-                }
-                else if (data.isclear === false) {
-                    data.update({ isclear: 1 })
-                        .then(() =>
-                            //find
-                            res.status(200).json(data));
-                }
-            })
-            .catch((err) => {
-                console.log("목록을 찾을수 없습니다.", err)
-                res.status(400).send("목록을 찾을 수  없습니다.")
-            })
+        .then((data) => {
+            if (data.isclear === false) {
+                data.update({ isclear: 1 })
+                .then(() => res.status(200).json(data))
+            } else if (data.isclear === true) {
+                data.update({ isclear: 0 })
+                .then(() => res.status(200).json(data))
+            } else { res.status(400) }
+        })
     },
 
-    shareDelete: (req,res)=>{
-        const { todoid } = req.body;
-        const Op = sequelize.Op;
-
-        todo.destroy({
-            where:{ id : todoid }
+    shareDelete: (req,res)=> { 
+        const { shareid  } = req.body;
+        const session_userid = req.session.passport.user
+        todo_user.destroy({
+           where: {
+               id : shareid
+           }
         })
-            .then()
+        .then(()=>{
+            todo.findAll({
+                where: {
+                    [Op.or] : [{'$users.id$': session_userid},{ user_id: session_userid}]  
+                },
+                include: [{
+                    model: user,
+                    attributes: ['id','nickname','email'],
+                    through:{
+                        attributes: ['id', 'isclear','userId','todoId']
+                    }
+                }]
+            })
+            .then((data)=>{
+                res.status(200).json(data);
+            })
+        })
+        .catch((err)=> res.status(400).send("삭제불가", err))
     }
 }

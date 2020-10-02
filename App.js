@@ -77,7 +77,7 @@ app.get("/main", controller.mainController);
 app.post("/todoedit", controller.todoEdit);
 app.post("/todowrite", controller.todoWrite);
 app.post("/tododelete", controller.todoDelete);
-app.post("/clear", controller.clear);
+app.post("/todoclear", controller.todoClear);
 
 app.post("/followadd", controller.followAdd);
 app.get("/followlist", controller.followList);
@@ -85,6 +85,8 @@ app.post("/followdelete", controller.followDelete);
 
 app.post("/sharetodo", controller.shareTodo);
 app.get("/sharelist", controller.shareList);
+app.post("/sharedelete", controller.shareDelete);
+app.post("/shareclear", controller.shareClear);
 
 
 app.set('port', port);
