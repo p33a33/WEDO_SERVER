@@ -71,6 +71,7 @@ app.post("/signup", controller.signUpController);
 app.post("/signout", controller.signOutController);
 app.post("/signeditnickname", controller.signEditNickname);
 app.post("/signeditpassword", controller.signEditPassword);
+app.post("/userDelete", controller.userDelete);
 
 app.get("/mypage", controller.mypageController);
 app.get("/main", controller.mainController);

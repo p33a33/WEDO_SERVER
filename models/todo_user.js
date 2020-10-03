@@ -13,6 +13,7 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   };
+  
   todo_user.init({
     isclear: {
       type: DataTypes.BOOLEAN,

@@ -73,7 +73,7 @@ module.exports = {
             });
     },
     signEditPassword: (req, res) => {
-        const { oldpassword, newpassword } = req.body;
+        const { newpassword } = req.body;
         const session_userid = req.session.passport.user;
         /* 수 정 */
         user.update({ password: newpassword }, { where: { id: session_userid } })
@@ -91,8 +91,9 @@ module.exports = {
             req.session.destroy(err => {
                 if (err) {
                     console.log(err);
+                    res.status(400).send("로그아웃 실패!")
                 } else {
-                    console.log("destroy 성공")
+                    res.status(200).send("로그아웃 성공")
                 }
             });
         }
@@ -110,9 +111,10 @@ module.exports = {
                 res.status(500);
             })
     },
+
     todoWrite: (req, res) => {
         const session_userid = req.session.passport.user;
-        const { title, body } = req.body;
+        const { title, body } = req.body; 
         user
             .findOne({
                 where: {
@@ -136,10 +138,9 @@ module.exports = {
                     });
             })
     },
+
     todoEdit: (req, res) => {
-        // 수정할 todo를 어떻게 찾아갈것인가?
-        const { id, title, body } = req.body;
-        const session_userid = req.session.passport.user;
+        const { id, title, body } = req.body; 
 
         todo.update({ title: title, body: body }, { where: { id: id } })
             .then(() => {
@@ -155,8 +156,8 @@ module.exports = {
                     });
             })
     },
+
     todoDelete: (req, res) => {
-        //삭제할 todo를 어떻게 찾아 갈것인가??
         const { id } = req.body
         const session_userid = req.session.passport.user;
 
@@ -223,6 +224,7 @@ module.exports = {
             include: [{
                 model: user,
                 as: 'friend',
+                attributes: ['id','nickname', 'full_name','email'],
                 through: {
                     attributes: ['id', 'userId', 'friendId', 'block']
                 }
@@ -275,14 +277,27 @@ module.exports = {
     shareTodo: (req, res) => {
         const { todoid, friendid } = req.body;
 
-        todo.findOne({ where: { id: todoid } })
+        todo.findOne({ where: { id: todoid }, },
+            )
             .then((data) => {
                 user.findOne({ where: { id: friendid } })
                     .then((friend) => {
                         console.log(data, friend)
                         data.addUsers(friend) //혁신 2020.10.01
+                    }).then(()=>{
+                        todo.findOne({
+                            where: { id: todoid },
+                            include: [{
+                                model: user,
+                                attributes: ['id', 'nickname', 'email'],
+                                through: {
+                                    attributes: ['id', 'isclear', 'userId', 'todoId']
+                                }
+                            }]
+                        }).then(data => {
+                            res.status(200).json(data)
+                        })
                     })
-                res.status(200).json(data)
             })
             .catch((err) => {
                 console.log("글을 공유할 수 없습니다.", err);
@@ -293,10 +308,8 @@ module.exports = {
     shareList: (req, res) => {
         console.log(req.session)
         const session_userid = req.session.passport.user
-        todo.findAll({
-            where: {
-                [Op.or]: [{ '$users.id$': session_userid }, { user_id: session_userid }]
-            },
+        todo.findAll({ 
+            where: { '$users.id$': session_userid },
             include: [{
                 model: user,
                 attributes: ['id', 'nickname', 'email'],
@@ -362,5 +375,20 @@ module.exports = {
                     })
             })
             .catch((err) => res.status(400).send("삭제불가", err))
+    },
+
+    userDelete: (req, res) => {
+
+        const { id } = req.body
+
+        user.destroy({
+            where: {id: id}
+        })
+        .then(()=> {
+            res.status(200).send("회원 탈퇴 완료!")
+        })
+        .catch(()=>{
+            res.status(400).send("탈퇴 실패!")
+        })
     }
 }
