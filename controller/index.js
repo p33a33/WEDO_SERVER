@@ -306,25 +306,28 @@ module.exports = {
     },
 
     shareList: (req, res) => {
-        console.log(req.session)
+        const Op = sequelize.Op;
         const session_userid = req.session.passport.user
         todo.findAll({ 
-            where: { '$users.id$': session_userid },
-            include: [{
+          where:{  
+              [Op.or]: [{ user_id: session_userid }, { '$users.id$': session_userid }]},
+              // 나의 todo와 내가 share 당한 todo를 가져온다.
+              // where: { '$users.id$': session_userid },// 내가 share 당한 todo list만 가져오는 ver.
+            include: {
                 model: user,
                 attributes: ['id', 'nickname', 'email'],
                 through: {
                     attributes: ['id', 'isclear', 'userId', 'todoId']
                 }
-            }]
+            }
         })
-            .then((data) => {
-                res.status(200).json(data);
+        .then((data) => {
+            res.status(200).json(data);
             })
-            .catch((err) => {
-                console.log("공유글을 불러올 수 없습니다.", err)
-                res.status(400).send("공유글을 불러올 수 없습니다.")
-            })
+        .catch((err) => {
+            console.log("공유글을 불러올 수 없습니다.", err)
+            res.status(400).send("공유글을 불러올 수 없습니다.")
+        })
     },
 
     shareClear: (req, res) => {
