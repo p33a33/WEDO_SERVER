@@ -98,19 +98,22 @@ module.exports = {
             });
         }
     },
+    
+    // index.js - 310 번째 줄로 이동.
 
-
-    mainController: (req, res) => {
-        const session_userid = req.session.passport.user
-        todo.findAll({
-            where: { user_id: session_userid }
-        })
-            .then((data) => { res.status(200).json(data) })
-            .catch((err) => {
-                console.log("데이터를 조회할수 없습니다.", err);
-                res.status(500);
-            })
-    },
+    // mainController: (req, res) => {
+    //     //내가 작성한 todo 의 list를 가져옵니다.
+    //     const session_userid = req.session.passport.user
+    //     todo.findAll({
+    //         where: { user_id: session_userid }
+            
+    //     })
+    //         .then((data) => { res.status(200).json(data) })
+    //         .catch((err) => {
+    //             console.log("데이터를 조회할수 없습니다.", err);
+    //             res.status(500);
+    //         })
+    // },
 
     todoWrite: (req, res) => {
         const session_userid = req.session.passport.user;
@@ -178,7 +181,6 @@ module.exports = {
     },
     todoClear: (req, res) => {
         const { id } = req.body;
-
         todo.findOne({
             where: { id: id }
         })
@@ -275,8 +277,8 @@ module.exports = {
     },
 
     shareTodo: (req, res) => {
+        //share gks todo의 정보와 그안에 담긴 users를 가져옵니다. 
         const { todoid, friendid } = req.body;
-
         todo.findOne({ where: { id: todoid }, },
             )
             .then((data) => {
@@ -305,14 +307,16 @@ module.exports = {
             })
     },
 
-    shareList: (req, res) => {
+    mainController: (req, res) => {
         const Op = sequelize.Op;
         const session_userid = req.session.passport.user
         todo.findAll({ 
           where:{  
               [Op.or]: [{ user_id: session_userid }, { '$users.id$': session_userid }]},
-              // 나의 todo와 내가 share 당한 todo를 가져온다.
-              // where: { '$users.id$': session_userid },// 내가 share 당한 todo list만 가져오는 ver.
+              // 나의 todo와 내가 share 당한 todo를 가져옵니다.(나와 관계있는 모든 todo의 list).
+
+              // where: { '$users.id$': session_userid },
+              // 내가 share 당한 todo list만 가져오는 ver.
             include: {
                 model: user,
                 attributes: ['id', 'nickname', 'email'],
@@ -335,12 +339,10 @@ module.exports = {
         const Op = sequelize.Op;
         const session_userid = req.session.passport.user
 
-        todo.findOne({
-            where: {
-                [Op.or]: [{ user_id: session_userid }, { '$users.todo_users.userId$': session_userid }],
-                [Op.and]: [{ todoId: todoid }]
-            }
-        })
+        todo_user.findOne({
+            where: {userId: session_userid ,
+                    todoId: todoid },
+            })
             .then((data) => {
                 if (data.isclear === false) {
                     data.update({ isclear: 1 })

@@ -85,7 +85,7 @@ app.get("/followlist", controller.followList);
 app.post("/followdelete", controller.followDelete);
 
 app.post("/sharetodo", controller.shareTodo);
-app.get("/sharelist", controller.shareList);
+// app.get("/sharelist", controller.shareList);
 app.post("/sharedelete", controller.shareDelete);
 app.post("/shareclear", controller.shareClear);
 
