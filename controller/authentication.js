@@ -74,7 +74,6 @@ module.exports = {
             callbackURL: googleCredentials.web.redirect_uris // Google Page에서 인증이 끝나면 서버의 "/auth/google/redirect"로 Get 요청을 보냅니다. 
         },
             function (request, accessToken, refreshToken, profile, done) { // Google로부터 받은 profile의 email을 DB에서 조회합니다.
-                console.log(profile.displayName);
                 user.findOne({
                     where: { email: profile.emails[0].value }
                 })
