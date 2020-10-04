@@ -14,10 +14,15 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
   todo_user.init({
-    owner_id: DataTypes.INTEGER,
-    todo_id: DataTypes.INTEGER,
-    share_id: DataTypes.INTEGER,
-    isclear: DataTypes.BOOLEAN
+    isclear: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: 0
+    },
+    id: {
+      type : DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true
+    },
   }, {
     sequelize,
     modelName: 'todo_user',
