@@ -1,11 +1,11 @@
 {
   "development": {
-    "username": "root",
-    "password": "1",
-    "database": "project_1_database",
-    "host": "localhost",
+    "username": "admin",
+    "password": "1234qwer",
+    "database": "project7_database",
+    "host": "project7-database.cff000klu5ma.ap-northeast-2.rds.amazonaws.com",
     "dialect": "mysql",
-    "port": "3306"
+    "port": "13306"
   },
   "test": {
     "username": "adm",

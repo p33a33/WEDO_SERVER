@@ -21,7 +21,7 @@ module.exports = {
                 user.findOne({
                     where: {
                         email: username,
-                        password: Password
+                        password: password
                     }
                 })
                     .then(data => {
@@ -67,10 +67,11 @@ module.exports = {
 
     // OAuth를 이용한 Google 로그인
     oAuthGoogle(req, res, next) {
+        const googleCredentials = require('../config/google.json');
         passport.use(new GoogleStrategy({ // google Strategy의 환경을 설정합니다.
-            clientID: '11196805892-5motqqsh6pqh0hrpvr19evjnjobjkcsr.apps.googleusercontent.com',
-            clientSecret: `YegIiPCfqppvMfUuQiZFv2z6`,
-            callbackURL: 'http://localhost:5000/auth/google/redirect' // Google Page에서 인증이 끝나면 서버의 "/auth/google/redirect"로 Get 요청을 보냅니다. 
+            clientID: googleCredentials.web.client_id,
+            clientSecret: googleCredentials.web.client_secret,
+            callbackURL: googleCredentials.web.redirect_uris // Google Page에서 인증이 끝나면 서버의 "/auth/google/redirect"로 Get 요청을 보냅니다. 
         },
             function (request, accessToken, refreshToken, profile, done) { // Google로부터 받은 profile의 email을 DB에서 조회합니다.
                 console.log(profile.displayName);

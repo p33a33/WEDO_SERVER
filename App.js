@@ -3,20 +3,20 @@ const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const passport = require('passport')
 const controller = require('./controller/index');
-const auth = require('./controller/authentication')
+const auth = require('./controller/authentication');
 const LocalStrategy = require('passport-local').Strategy
 const cors = require('cors');
 const path = require('path');
 
-const models = require('./models/index')
+const models = require('./models/index');
 
 // const usersRouter = require('');
 // const linkRouter = require('');
 
 const morgan = require('morgan');
-const bodyParser = require('body-parser')
+const bodyParser = require('body-parser');
 const app = express();
-const port = 3000;
+const port = 5000;
 
 app.use(
     session({
@@ -45,7 +45,7 @@ models.sequelize.sync()
 
 app.use(
     cors({
-        origin: ["http://localhost:3000", "http://localhost:5000/*"],
+        origin: ["http://localhost:3000/*", "http://localhost:5000/*"],
         method: ["GET", "POST"],
         credentials: true
     })
@@ -71,6 +71,7 @@ app.post("/signup", controller.signUpController);
 app.post("/signout", controller.signOutController);
 app.post("/signeditnickname", controller.signEditNickname);
 app.post("/signeditpassword", controller.signEditPassword);
+app.post("/userDelete", controller.userDelete);
 
 app.get("/mypage", controller.mypageController);
 app.get("/main", controller.mainController);
@@ -84,7 +85,7 @@ app.get("/followlist", controller.followList);
 app.post("/followdelete", controller.followDelete);
 
 app.post("/sharetodo", controller.shareTodo);
-app.get("/sharelist", controller.shareList);
+// app.get("/sharelist", controller.shareList);
 app.post("/sharedelete", controller.shareDelete);
 app.post("/shareclear", controller.shareClear);
 

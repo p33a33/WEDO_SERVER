@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       todo.belongsToMany(models.user,{
-        through: 'todo_users'
+        through: 'todo_user'
       })
     }
   };
