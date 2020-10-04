@@ -98,7 +98,7 @@ module.exports = {
             });
         }
     },
-    
+
     // index.js - 310 번째 줄로 이동.
 
     // mainController: (req, res) => {
@@ -106,7 +106,7 @@ module.exports = {
     //     const session_userid = req.session.passport.user
     //     todo.findAll({
     //         where: { user_id: session_userid }
-            
+
     //     })
     //         .then((data) => { res.status(200).json(data) })
     //         .catch((err) => {
@@ -117,7 +117,7 @@ module.exports = {
 
     todoWrite: (req, res) => {
         const session_userid = req.session.passport.user;
-        const { title, body } = req.body; 
+        const { title, body } = req.body;
         user
             .findOne({
                 where: {
@@ -143,7 +143,7 @@ module.exports = {
     },
 
     todoEdit: (req, res) => {
-        const { id, title, body } = req.body; 
+        const { id, title, body } = req.body;
 
         todo.update({ title: title, body: body }, { where: { id: id } })
             .then(() => {
@@ -165,19 +165,19 @@ module.exports = {
         const session_userid = req.session.passport.user;
 
         todo.destroy({ where: { id: id } })
-        then(() => {
-            todo.findAll({
-                where: {
-                    user_id: session_userid
-                }
+            .then(() => { //then에 .이 빠져있어서 채워넣었습니다.
+                todo.findAll({
+                    where: {
+                        user_id: session_userid
+                    }
+                })
+                    .then((data) => {
+                        res.status(200).json(data)
+                    })
+                    .catch(err => {
+                        console.error(err);
+                    })
             })
-                .then((data) => {
-                    res.status(200).json(data)
-                })
-                .catch(err => {
-                    console.error(err);
-                })
-        })
     },
     todoClear: (req, res) => {
         const { id } = req.body;
@@ -226,7 +226,7 @@ module.exports = {
             include: [{
                 model: user,
                 as: 'friend',
-                attributes: ['id','nickname', 'full_name','email'],
+                attributes: ['id', 'nickname', 'full_name', 'email'], // user정보에 full_name이 빠져있어서 채워넣었습니다.
                 through: {
                     attributes: ['id', 'userId', 'friendId', 'block']
                 }
@@ -280,13 +280,13 @@ module.exports = {
         //share gks todo의 정보와 그안에 담긴 users를 가져옵니다. 
         const { todoid, friendid } = req.body;
         todo.findOne({ where: { id: todoid }, },
-            )
+        )
             .then((data) => {
                 user.findOne({ where: { id: friendid } })
                     .then((friend) => {
                         console.log(data, friend)
                         data.addUsers(friend) //혁신 2020.10.01
-                    }).then(()=>{
+                    }).then(() => {
                         todo.findOne({
                             where: { id: todoid },
                             include: [{
@@ -310,28 +310,29 @@ module.exports = {
     mainController: (req, res) => {
         const Op = sequelize.Op;
         const session_userid = req.session.passport.user
-        todo.findAll({ 
-          where:{  
-              [Op.or]: [{ user_id: session_userid }, { '$users.id$': session_userid }]},
-              // 나의 todo와 내가 share 당한 todo를 가져옵니다.(나와 관계있는 모든 todo의 list).
+        todo.findAll({
+            where: {
+                [Op.or]: [{ user_id: session_userid }, { '$users.id$': session_userid }]
+            },
+            // 나의 todo와 내가 share 당한 todo를 가져옵니다.(나와 관계있는 모든 todo의 list).
 
-              // where: { '$users.id$': session_userid },
-              // 내가 share 당한 todo list만 가져오는 ver.
+            // where: { '$users.id$': session_userid },
+            // 내가 share 당한 todo list만 가져오는 ver.
             include: {
                 model: user,
-                attributes: ['id', 'nickname', 'email'],
+                attributes: ['id', 'nickname', 'full_name', 'email'],
                 through: {
                     attributes: ['id', 'isclear', 'userId', 'todoId']
                 }
             }
         })
-        .then((data) => {
-            res.status(200).json(data);
+            .then((data) => {
+                res.status(200).json(data);
             })
-        .catch((err) => {
-            console.log("공유글을 불러올 수 없습니다.", err)
-            res.status(400).send("공유글을 불러올 수 없습니다.")
-        })
+            .catch((err) => {
+                console.log("공유글을 불러올 수 없습니다.", err)
+                res.status(400).send("공유글을 불러올 수 없습니다.")
+            })
     },
 
     shareClear: (req, res) => {
@@ -340,9 +341,11 @@ module.exports = {
         const session_userid = req.session.passport.user
 
         todo_user.findOne({
-            where: {userId: session_userid ,
-                    todoId: todoid },
-            })
+            where: {
+                userId: session_userid,
+                todoId: todoid
+            },
+        })
             .then((data) => {
                 if (data.isclear === false) {
                     data.update({ isclear: 1 })
@@ -387,13 +390,13 @@ module.exports = {
         const { id } = req.body
 
         user.destroy({
-            where: {id: id}
+            where: { id: id }
         })
-        .then(()=> {
-            res.status(200).send("회원 탈퇴 완료!")
-        })
-        .catch(()=>{
-            res.status(400).send("탈퇴 실패!")
-        })
+            .then(() => {
+                res.status(200).send("회원 탈퇴 완료!")
+            })
+            .catch(() => {
+                res.status(400).send("탈퇴 실패!")
+            })
     }
 }
