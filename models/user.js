@@ -17,10 +17,11 @@ module.exports = (sequelize, DataTypes) => {
       }),
 
         user.belongsToMany(models.todo, {
-          through: 'todo_users'
+          through: 'todo_user'
         })
     }
   };
+  
   user.init({
     email: DataTypes.STRING,
     nickname: DataTypes.STRING,
@@ -30,6 +31,7 @@ module.exports = (sequelize, DataTypes) => {
     sequelize,
     modelName: 'user',
   });
+
   user.addHook('afterValidate', (data, options) => {
     if (data.password) {
       data.password = crypto.createHmac('sha256', '4bproject')

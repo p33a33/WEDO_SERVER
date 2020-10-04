@@ -71,6 +71,7 @@ app.post("/signup", controller.signUpController);
 app.post("/signout", controller.signOutController);
 app.post("/signeditnickname", controller.signEditNickname);
 app.post("/signeditpassword", controller.signEditPassword);
+app.post("/userDelete", controller.userDelete);
 
 app.get("/mypage", controller.mypageController);
 app.get("/main", controller.mainController);
@@ -84,7 +85,7 @@ app.get("/followlist", controller.followList);
 app.post("/followdelete", controller.followDelete);
 
 app.post("/sharetodo", controller.shareTodo);
-app.get("/sharelist", controller.shareList);
+// app.get("/sharelist", controller.shareList);
 app.post("/sharedelete", controller.shareDelete);
 app.post("/shareclear", controller.shareClear);
 
