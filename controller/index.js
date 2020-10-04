@@ -122,12 +122,13 @@ module.exports = {
 
     // index.js - 310 번째 줄로 이동.
 
+    // index.js - 310 번째 줄로 이동.
+
     // mainController: (req, res) => {
     //     //내가 작성한 todo 의 list를 가져옵니다.
     //     const session_userid = req.session.passport.user
     //     todo.findAll({
     //         where: { user_id: session_userid }
-
     //     })
     //         .then((data) => { res.status(200).json(data) })
     //         .catch((err) => {

@@ -3,18 +3,18 @@ const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const passport = require('passport')
 const controller = require('./controller/index');
-const auth = require('./controller/authentication')
+const auth = require('./controller/authentication');
 const LocalStrategy = require('passport-local').Strategy
 const cors = require('cors');
 const path = require('path');
 
-const models = require('./models/index')
+const models = require('./models/index');
 
 // const usersRouter = require('');
 // const linkRouter = require('');
 
 const morgan = require('morgan');
-const bodyParser = require('body-parser')
+const bodyParser = require('body-parser');
 const app = express();
 const port = 5000;
 
@@ -45,7 +45,7 @@ models.sequelize.sync()
 
 app.use(
     cors({
-        origin: ["http://localhost:3000", "http://localhost:5000/*"],
+        origin: ["http://localhost:3000/*", "http://localhost:5000/*"],
         method: ["GET", "POST"],
         credentials: true
     })
