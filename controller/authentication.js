@@ -26,7 +26,6 @@ module.exports = {
                     }
                 })
                     .then(data => {
-                        console.log(data)
                         if (data) {
                             return done(null, data)
                         } else {
@@ -41,7 +40,7 @@ module.exports = {
             if (err) { return next(err) }
             if (!user) { res.status(401).end() }
             else {
-                req.login(user, (err) => {
+                req.logIn(user, (err) => {
                     if (err) { return next(err) }
                     return res.status(200).end();
                 })
@@ -56,7 +55,6 @@ module.exports = {
 
 
         // serialize가 된 user가 Session을 유지하고 있는지(권한이 있는지) 확인하기위해 페이지 이동시 마다 user의 정보를 확인합니다.
-        // 현재 작동 안되는데 왜 안되는지 모르겠습니당
 
         passport.deserializeUser((userId, done) => {
             console.log('is deserialize working?')

@@ -22,7 +22,10 @@ app.use(
     session({
         secret: '@4B', // 상의 후 결정
         resave: false,
-        saveUninitialized: true
+        saveUninitialized: true,
+        cookie: {
+            secure: false
+        }
     })
 );
 
@@ -47,12 +50,11 @@ app.use(
     cors({
         origin: ['http://localhost:3000'],
         method: ["GET", "POST"],
-        credentials: true
+        credentials: true,
     })
 );
 app.use(passport.initialize())
 app.use(passport.session());
-app.use(express.static(path.join(__dirname, 'html')));
 // POSTMAN을 통한 test
 app.use(morgan('dev'));
 
