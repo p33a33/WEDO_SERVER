@@ -19,14 +19,11 @@ module.exports = {
 
             (username, password, done) => {            /* req 받은 username(email)과 password를 DB와 비교하는 데이터 처리 함수를 정의했습니다. */
                 user.findOne({
-                    where: email = "geust@guest.com" ?
-                        {
-                            email: username
-                        } :
-                        {
-                            email: username,
-                            password: password
-                        }
+                    where:
+                    {
+                        email: username,
+                        password: password
+                    }
                 })
                     .then(data => {
                         console.log(data)
