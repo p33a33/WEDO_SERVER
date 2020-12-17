@@ -1,9 +1,9 @@
 {
   "development": {
-    "username": "",
-    "password": "",
-    "database": "",
-    "host": "",
+    "username": "root",
+    "password": "1",
+    "database": "project_1_database",
+    "host": "localhost",
     "dialect": "mysql",
     "port": "3306"
   }
