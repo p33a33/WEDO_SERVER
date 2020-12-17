@@ -1,0 +1,10 @@
+{
+    "java.project.resourceFilters": [
+        "node_modules",
+        ".git"
+    ],
+    // "search.useIgnoreFiles": false,
+    // "search.exclude": {
+    //     "**/node_modules": false,
+    // },
+}

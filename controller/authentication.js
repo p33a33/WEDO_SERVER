@@ -19,14 +19,19 @@ module.exports = {
 
             (username, password, done) => {            /* req 받은 username(email)과 password를 DB와 비교하는 데이터 처리 함수를 정의했습니다. */
                 user.findOne({
-                    where: {
-                        email: username,
-                        password: password
-                    }
+                    where: email = "geust@guest.com" ?
+                        {
+                            email: username
+                        } :
+                        {
+                            email: username,
+                            password: password
+                        }
                 })
                     .then(data => {
+                        console.log(data)
                         if (data) {
-                            return done(null, data.dataValues)
+                            return done(null, data)
                         } else {
                             return done(null, false, { message: `아이디나 비밀번호를 확인해주세요` })
                         }
@@ -35,13 +40,20 @@ module.exports = {
 
         // 위에서 정의한 함수를 바탕으로, 실제로 Success와 Failure 결과를 반환하는 함수입니다. app.post('/signin', callback)의 callback 자리에 들어가는 함수입니다.
         // callback으로 사용될 경우 인자가 필요 없지만, 지금과 같이 떨어져 있는 경우에는 뒤에 (req, res) 인자를 반드시 줘야합니다(실행의 개념).
-        passport.authenticate('local', {
-            successRedirect: 'http://localhost:3000/main',
-            failureRedirect: 'http://localhost:3000/'
+        passport.authenticate('local', (err, user, info) => {
+            if (err) { return next(err) }
+            if (!user) { res.status(401).end() }
+            else {
+                req.login(user, (err) => {
+                    if (err) { return next(err) }
+                    return res.status(200).end();
+                })
+            }
         })(req, res, next)
 
         // authenticate에서 Success 되었다면, 해당 유저를 구분할 수 있도록 Session에 해당 유저의 Unique한 데이터를 담습니다.
         passport.serializeUser((user, done) => { // serializeUser 메소드에 오는 인자 user는 로그인 성공 판정 함수에서 반환하는 해당 유저의 정보입니다. [현재 파일 27번째줄 done의 두번째 인자를 여기로 끌고옵니다.]
+            console.log('serialize works here')
             done(null, user.id) // session에 users 테이블의 id값을 담았습니다.
         })
 
@@ -67,12 +79,14 @@ module.exports = {
 
     // OAuth를 이용한 Google 로그인
     oAuthGoogle(req, res, next) {
+        // const googleCredentials = require('../config/google.json');
         passport.use(new GoogleStrategy({ // google Strategy의 환경을 설정합니다.
-            clientID: '11196805892-5motqqsh6pqh0hrpvr19evjnjobjkcsr.apps.googleusercontent.com',
+            clientID: "11196805892-5motqqsh6pqh0hrpvr19evjnjobjkcsr.apps.googleusercontent.com",
             clientSecret: `YegIiPCfqppvMfUuQiZFv2z6`,
-            callbackURL: 'http://localhost:5000/auth/google/redirect' // Google Page에서 인증이 끝나면 서버의 "/auth/google/redirect"로 Get 요청을 보냅니다. 
+            callbackURL: "http://1b0ca4da031f.ngrok.io/auth/google/redirect"// Google Page에서 인증이 끝나면 서버의 "/auth/google/redirect"로 Get 요청을 보냅니다. 
         },
             function (request, accessToken, refreshToken, profile, done) { // Google로부터 받은 profile의 email을 DB에서 조회합니다.
+                console.log('user profile', profile)
                 user.findOne({
                     where: { email: profile.emails[0].value }
                 })
@@ -110,6 +124,9 @@ module.exports = {
     },
 
     googleRedirect(req, res, next) {    // "/auth/google/redirect"로 들어온 Get 요청을 처리해줍니다. 로그인이 성공한 경우 클라이언트의 /main으로 리다이렉트 해줍니다.
-        passport.authenticate('google', { successRedirect: `http://localhost:3000/main` })(req, res, next)
+        passport.authenticate('google', {
+            successRedirect: "http://codestates.com",
+            failureRedirect: "http://wecode.co.kr"
+        })(req, res, next)
     }
 }

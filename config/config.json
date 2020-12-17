@@ -1,24 +1,10 @@
 {
   "development": {
-    "username": "root",
-    "password": null,
-    "database": "project_1_database",
-    "host": "localhost",
+    "username": "",
+    "password": "",
+    "database": "",
+    "host": "",
     "dialect": "mysql",
     "port": "3306"
-  },
-  "test": {
-    "username": "adm",
-    "password": null,
-    "database": "project_1_database",
-    "host": "project-1-database.cvi8bulrqijy.us-east-2.rds.amazonaws.com",
-    "dialect": "mysql"
-  },
-  "production": {
-    "username": "admin",
-    "password": null,
-    "database": "project_1_database",
-    "host": "project-1-database.cvi8bulrqijy.us-east-2.rds.amazonaws.com",
-    "dialect": "mysql"
   }
 }

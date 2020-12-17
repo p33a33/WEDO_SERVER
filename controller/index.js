@@ -14,9 +14,36 @@ const crypto = require('crypto');
 const Op = sequelize.Op;
 
 module.exports = {
+    noSignin: (req, res) => {
+        req.session.passport = { user: 999 }
+        return res.status(200).end();
+    },
+
+    userinfoController: (req, res) => {
+        const session_userid = req.session.passport.user;
+        console.log(req.session)
+
+        user.findOne({
+            where: {
+                id: session_userid
+            }
+        })
+            .then(data => res.status(200).json(data))
+    },
+
+    friendinfoController: (req, res) => {
+        let { id } = req.body
+        user.findOne({
+            where: {
+                id: id
+            }
+        })
+            .then(data => res.status(200).json(data))
+
+    },
     signUpController: (req, res) => {
         const { email, password, fullname, nickname } = req.body;
-
+        console.log(email, password)
         user.findOrCreate({
             where: {
                 email: email,
@@ -29,7 +56,6 @@ module.exports = {
         })
             .then(async ([user, created]) => {
                 if (!created) {
-                    console.log(req.session.passport.user)
                     return res.status(409).send("이미 존재하는 email입니다.");
                 }
                 const data = await user.get({ plain: true });
@@ -101,12 +127,13 @@ module.exports = {
 
     // index.js - 310 번째 줄로 이동.
 
+    // index.js - 310 번째 줄로 이동.
+
     // mainController: (req, res) => {
     //     //내가 작성한 todo 의 list를 가져옵니다.
     //     const session_userid = req.session.passport.user
     //     todo.findAll({
     //         where: { user_id: session_userid }
-
     //     })
     //         .then((data) => { res.status(200).json(data) })
     //         .catch((err) => {
@@ -310,6 +337,7 @@ module.exports = {
     mainController: (req, res) => {
         const Op = sequelize.Op;
         const session_userid = req.session.passport.user
+        console.log('세션 확인', req.session)
         todo.findAll({
             where: {
                 [Op.or]: [{ user_id: session_userid }, { '$users.id$': session_userid }]
@@ -355,6 +383,7 @@ module.exports = {
                         .then(() => res.status(200).json(data))
                 } else { res.status(400) }
             })
+            .catch(e => console.log(e))
     },
 
     shareDelete: (req, res) => {
