@@ -14,8 +14,14 @@ const crypto = require('crypto');
 const Op = sequelize.Op;
 
 module.exports = {
+    noSignin: (req, res) => {
+        req.session.passport = { user: 999 }
+        return res.status(200).end();
+    },
+
     userinfoController: (req, res) => {
         const session_userid = req.session.passport.user;
+        console.log(req.session)
 
         user.findOne({
             where: {
@@ -37,7 +43,7 @@ module.exports = {
     },
     signUpController: (req, res) => {
         const { email, password, fullname, nickname } = req.body;
-
+        console.log(email, password)
         user.findOrCreate({
             where: {
                 email: email,
@@ -50,7 +56,6 @@ module.exports = {
         })
             .then(async ([user, created]) => {
                 if (!created) {
-                    console.log(req.session.passport.user)
                     return res.status(409).send("이미 존재하는 email입니다.");
                 }
                 const data = await user.get({ plain: true });
@@ -332,6 +337,7 @@ module.exports = {
     mainController: (req, res) => {
         const Op = sequelize.Op;
         const session_userid = req.session.passport.user
+        console.log('세션 확인', req.session)
         todo.findAll({
             where: {
                 [Op.or]: [{ user_id: session_userid }, { '$users.id$': session_userid }]

@@ -45,7 +45,7 @@ models.sequelize.sync()
 
 app.use(
     cors({
-        origin: ["http://localhost:3000/*", "http://localhost:5000/*"],
+        origin: ['http://localhost:3000'],
         method: ["GET", "POST"],
         credentials: true
     })
@@ -61,6 +61,7 @@ app.use(morgan('dev'));
 // app.post("/signin", controller.signInController); => passport Local 인증 구현으로 사용 안하게 되었습니당.
 // PASSPORT 를 통한 로컬 로그인 구현
 app.post('/signin', auth.signin)
+app.post('/noSignin', controller.noSignin)
 
 //PASSPORT - OAUTH2.0 - GOOGLE
 app.get('/auth/google', (req, res, next) => auth.oAuthGoogle(req, res, next))

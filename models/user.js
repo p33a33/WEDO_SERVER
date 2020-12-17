@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
         })
     }
   };
-  
+
   user.init({
     email: DataTypes.STRING,
     nickname: DataTypes.STRING,
@@ -47,6 +47,8 @@ module.exports = (sequelize, DataTypes) => {
       data.where.password = crypto.createHmac('sha256', '4bproject')
         .update(data.where.password)
         .digest("base64")
+
+      console.log(data.where.password)
     }
   })
 
